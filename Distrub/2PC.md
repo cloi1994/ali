@@ -46,7 +46,7 @@ Sites:
 
 Three-Phase Commit，三阶段提交，分为CanCommit、PreCommit、do Commit三个阶段。
 
-![image-20190126003915376](/Users/ck/Library/Application Support/typora-user-images/image-20190126003915376.png)
+![image-20190126003915376](https://static.oschina.net/uploads/space/2016/1206/215333_yPWJ_159239.png)
 
 
 
