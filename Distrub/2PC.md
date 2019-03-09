@@ -2,17 +2,18 @@
 
 在阶段1中，协调者发起一个提议，分别问询各参与者是否接受
 
- 
+ ![image-20190126001222699](https://www.hollischuang.com/wp-content/uploads/2015/12/success.png)
 
-![image-20190126001216693](/Users/ck/Library/Application Support/typora-user-images/image-20190126001216693.png)
 
- 
+
 
 ### 2.3 阶段2
 
 在阶段2中，协调者根据参与者的反馈，提交或中止事务，如果参与者全部同意则提交，只要有一个参与者不同意就中止。
 
-![image-20190126001222699](/Users/ck/Library/Application Support/typora-user-images/image-20190126001222699.png)
+![image-20190126001222699](https://www.hollischuang.com/wp-content/uploads/2015/12/fail.png)
+
+
 
 ### 2.4 Failure
 
