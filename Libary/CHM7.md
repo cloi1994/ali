@@ -6,6 +6,8 @@ ConcurrentHashMap是由Segment数组结构和HashEntry数组结构组成。Segme
 
 ![å¾ 2. æå¥ä¸ä¸ªèç¹å Segment çç"æç¤ºæå¾ï¼](https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image004.jpg)
 
+当ConcurrentMaps使用map.get(key)时返回为null,无法判断key是不存在还是值为空，non-concurrent还可以再调用map.contains(key)检查，但ConcurrentMaps可能再两次调用间已经发生改变。
+
 ## HashEntry 类
 
 HashEntry 用来封装散列映射表中的键值对。在 HashEntry 类中，key，hash 和 next 域都被声明为 final 型，value 域被声明为 volatile 型。
