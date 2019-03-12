@@ -53,9 +53,15 @@ ConcurrentHashMap 默认创建 16 个 Segment 对象的数组。每个 Segment �
 
 1. Put方法首先定位到Segment，然后在Segment里进行插入操作。
 
-2. 插入操作需要经历两个步骤，第一步判断是否需要对Segment里的HashEntry数组进行扩容，第二步定位添加元素的位置然后放在HashEntry数组里
+2. 插入操作需要经历两个步骤，
 
-3. 接着是找是否存在同样一个key的结点，如果存在就直接替换这个结点的值。否则创建一个新的结点并添加到hash链的头部，这时一定要修改modCount和count的值，同样修改count的值一定要放在最后一步
+3. if: 判断是否需要对Segment里的HashEntry数组进行扩容
+
+4. 定位添加元素的位置然后放在HashEntry数组里
+
+5. 如果key存在就直接替换这个结点的value。
+   否则创建一个新的结点并添加到hash链的头部，这时一定要修改modCount和count的值
+   同样修改count的值一定要放在最后一步
 
 #### Get
 
