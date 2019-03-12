@@ -100,12 +100,30 @@ PS2: 对hash链进行遍历不需要加锁的原因在于**链指针next是final
 - 例如，当执行get方法时，刚执行完getFirst(hash)之后，另一个线程执行了删除操作并更新头结点，这就导致get方法中返回的头结点不是最新的。
 - 这是可以允许，通过对count变量的协调机制，get能读取到几乎最新的数据，虽然可能不是最新的。要得到最新的数据，只有采用完全的同步。
 
+
 PS3: 理论上结点的值不可能为空，这是因为 put的时候就进行了判断，如果为空就要抛NullPointerException。
 
 - 空值的唯一源头就是HashEntry中的默认值，因为 HashEntry中的value不是final的，非同步读取有可能读取到空值。
 - 仔细看下put操作的语句：tab[index] = new HashEntry<K,V>(key, hash, first, value)，
 - 在这条语句中，HashEntry构造函数中对value的赋值以及对tab[index]的赋值可能被重新排序，这就可能导致结点的值为空。这里当v为空时，
 - 可能是一个线程正在改变节点，而之前的get操作都未进行锁定，根据bernstein条件，读后写或写后读都会引起数据的不一致，所以这里要对这个e重新上锁再读一遍，以保证得到的是正确值。
+
+#### Happen Before
+在get操作里只需要读不需要写共享变量count和value，所以可以不用加锁。之所以不会读到过期的值，
+
+是根据java内存模型的happen before原则，对volatile字段的写入操作先于读操作，
+
+即使两个线程同时修改和获取volatile变量，get操作也能拿到最新的值，这是用volatile替换锁的经典应用场景。
+
+#### 重排序
+
+使用锁去读取value是不需要的，因为一个竞争的remove操作不会使value为空。
+
+对新的内存模型来说，readValueUnderLock是不需要的，但是对于旧的内存模型，因为重排，put也许会看到null值
+
+Doug Lea也不确定null值的情况一定会发生，所以上面说到Bill Pugh曾经建议把readValueUnderLock放在这里
+
+
 
 #### Remove
 
