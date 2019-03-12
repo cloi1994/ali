@@ -100,7 +100,12 @@ PS2: 对hash链进行遍历不需要加锁的原因在于**链指针next是final
 - 例如，当执行get方法时，刚执行完getFirst(hash)之后，另一个线程执行了删除操作并更新头结点，这就导致get方法中返回的头结点不是最新的。
 - 这是可以允许，通过对count变量的协调机制，get能读取到几乎最新的数据，虽然可能不是最新的。要得到最新的数据，只有采用完全的同步。
 
-PS3: 理论上结点的值不可能为空，这是因为 put的时候就进行了判断，如果为空就要抛NullPointerException。空值的唯一源头就是HashEntry中的默认值，因为 HashEntry中的value不是final的，非同步读取有可能读取到空值。仔细看下put操作的语句：tab[index] = new HashEntry<K,V>(key, hash, first, value)，在这条语句中，HashEntry构造函数中对value的赋值以及对tab[index]的赋值可能被重新排序，这就可能导致结点的值为空。这里当v为空时，可能是一个线程正在改变节点，而之前的get操作都未进行锁定，根据bernstein条件，读后写或写后读都会引起数据的不一致，所以这里要对这个e重新上锁再读一遍，以保证得到的是正确值。
+PS3: 理论上结点的值不可能为空，这是因为 put的时候就进行了判断，如果为空就要抛NullPointerException。
+
+- 空值的唯一源头就是HashEntry中的默认值，因为 HashEntry中的value不是final的，非同步读取有可能读取到空值。
+- 仔细看下put操作的语句：tab[index] = new HashEntry<K,V>(key, hash, first, value)，
+- 在这条语句中，HashEntry构造函数中对value的赋值以及对tab[index]的赋值可能被重新排序，这就可能导致结点的值为空。这里当v为空时，
+- 可能是一个线程正在改变节点，而之前的get操作都未进行锁定，根据bernstein条件，读后写或写后读都会引起数据的不一致，所以这里要对这个e重新上锁再读一遍，以保证得到的是正确值。
 
 #### Remove
 
@@ -108,7 +113,7 @@ PS3: 理论上结点的值不可能为空，这是因为 put的时候就进行�
 2. 遍历这个链表找到要删除的节点
 3. 把待删除节点之后的所有节点保留在新链表中，把待删除节点之前的每个节点克隆到新链表中。
 
-![a(https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image007.jpg)
+![a](https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image007.jpg)
 
 ![c](https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image008.jpg)
 
