@@ -4,8 +4,10 @@ ConcurrentHashMap是由Segment数组结构和HashEntry数组结构组成。Segme
 
 一个ConcurrentHashMap里包含一个Segment数组，Segment的结构和HashMap类似，是一种数组和链表结构， 一个Segment里包含一个HashEntry数组，每个HashEntry是一个链表结构的元素， 每个Segment守护者一个HashEntry数组里的元素,当对HashEntry数组的数据进行修改时，必须首先获得它对应的Segment锁。
 
-![å¾ 2. æå¥ä¸ä¸ªèç¹å Segment çç"æç¤ºæå¾ï¼](https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image004.jpg)
+![s](https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image004.jpg)
 
+
+### 和Hashmap分別
 当ConcurrentMaps使用map.get(key)时返回为null,无法判断key是不存在还是值为空，non-concurrent还可以再调用map.contains(key)检查，但ConcurrentMaps可能再两次调用间已经发生改变。
 
 ## HashEntry 类
@@ -87,9 +89,9 @@ V get(Object key, int hash) {
 2. 遍历这个链表找到要删除的节点
 3. 把待删除节点之后的所有节点保留在新链表中，把待删除节点之前的每个节点克隆到新链表中。
 
-![å¾ 4. æ§è¡å é¤ä¹åçåé¾è¡¨ï¼](https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image007.jpg)
+![a(https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image007.jpg)
 
-![å¾ 5. æ§è¡å é¤ä¹åçæ°é¾è¡¨](https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image008.jpg)
+![c](https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image008.jpg)
 
 ​	假设写线程执行 remove 操作，要删除链表的 C 节点，另一个读线程同时正在遍历这个链表。
 
