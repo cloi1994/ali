@@ -143,6 +143,8 @@ Doug Lea也不确定null值的情况一定会发生，所以上面说到Bill Pug
 
 在插入元素前会先判断Segment里的HashEntry数组是否超过容量（threshold），如果超过阀值，数组进行扩容。值得一提的是，Segment的扩容判断比HashMap更恰当，因为HashMap是在插入元素后判断元素是否已经到达容量的，如果到达了就进行扩容，但是很有可能扩容之后没有新元素插入，这时HashMap就进行了一次无效的扩容。
 
+Segment size 是固定的。太多浪费Time and Space, 太小就有thread competition。
+
 ##### 如何扩容?
 
 扩容的时候首先会创建一个两倍于原容量的数组，然后将原数组里的元素进行再hash后插入到新的数组里。为了高效ConcurrentHashMap不会对整个容器进行扩容，而只对某个segment进行扩容。
