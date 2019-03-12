@@ -65,27 +65,11 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
 }
 ```
 
-假设table已经初始化完成，put操作采用CAS+synchronized实现并发插入或更新操作，具体实现如下。
+插入时，首先判断是否key和value是否为null，是则抛出空指针异常，若不是，判断表是不是未初始化，如果尚未初始化，则调用initTable()函数初始化表，否则定位到相应的数组槽，如果数组槽为空，则用CAS将结点挂上去。否则判断是否是ForwardingNode结点，若是则调用hlepTransfer帮助扩容。若均不是，则一定是普通链表节点或TreeBin结点，利用synchronized锁住链表头结点，如果是普通链表结点则用尾插法插入，如果是树结点调用putTreeVal函数插入红黑树。最后还要利用binCount检查是否链表过长需要转红黑树，以及计数器加1判断是否要扩容。
 
-1. 判断存储的key、value是否为空，若为空，则抛出异常，否则，进入步骤②
+**put操作会用synchronized进行加锁。除非数组槽为空，则用CAS操作避免加锁。**
 
-2. 计算key的hash值，随后进入无限循环，该无限循环可以确保成功插入数据，若table表为空或者长度为0，则初始化table表，否则，进入步骤③
-
-3. 根据key的hash值取出table表中的结点元素，若取出的结点为空（该桶为空），则使用CAS将key、value、hash值生成的结点放入桶中。否则，进入步骤④
-
-4.  若该结点的的hash值为MOVED，则对该桶中的结点进行转移，否则，进入步骤⑤
-
-5. 对桶中的第一个结点（即table表中的结点）进行加锁
-
-   - 如果f.hash >= 0，说明f是链表结构的头结点，遍历链表，如果找到对应的node节点，则修改value，否则在链表尾部加入节点。
-
-   - 如果f是TreeBin类型节点，说明f是红黑树根节点，则在树结构上遍历元素，更新或增加节点。
-
-   - 如果链表中节点数binCount >= TREEIFY_THRESHOLD(默认是8)，则把链表转化为红黑树结构
-
-6. 增加binCount的值
-
-
+当链表长度太长，超过了树化的阈值8，则调用treeifyBin将链表转换为红黑树。
 
 #### Get
 
@@ -124,4 +108,8 @@ JDK1.8中使用一个volatile类型的变量baseCount记录元素的个数，当
 所以counterCells存储的都是value为1的CounterCell对象，而这些对象是因为在CAS更新baseCounter值时，由于高并发而导致失败，最终将值保存到CounterCell中，放到counterCells里。这也就是为什么sumCount()中需要遍历counterCells数组，sum累加CounterCell.value值了。
 
 JDK 8 推荐使用mappingCount 方法，因为这个方法的返回值是 long 类型，不会因为 size 方法是 int 类型限制最大值。
+
+
+
+https://www.jianshu.com/p/487d00afe6ca
 
