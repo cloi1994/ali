@@ -1,8 +1,15 @@
 # ConcurrentHashMap 1.7
 
-ConcurrentHashMap是由Segment数组结构和HashEntry数组结构组成。Segment是一种可重入锁ReentrantLock，在ConcurrentHashMap里扮演锁的角色，HashEntry则用于存储键值对数据。
+ConcurrentHashMap是由Segment数组结构和HashEntry数组结构组成。
 
-一个ConcurrentHashMap里包含一个Segment数组，Segment的结构和HashMap类似，是一种数组和链表结构， 一个Segment里包含一个HashEntry数组，每个HashEntry是一个链表结构的元素， 每个Segment守护者一个HashEntry数组里的元素,当对HashEntry数组的数据进行修改时，必须首先获得它对应的Segment锁。
+- Segment是一种可重入锁ReentrantLock
+- HashEntry则用于存储键值对数据。
+
+一个ConcurrentHashMap里包含一个Segment数组，Segment的结构和HashMap类似，是一种数组和链表结构， 
+
+一个Segment里包含一个HashEntry数组，每个HashEntry是一个链表结构的元素， 
+
+每个Segment守护者一个HashEntry数组里的元素,当对HashEntry数组的数据进行修改时，必须首先获得它对应的Segment锁。
 
 ![s](https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image004.jpg)
 
@@ -12,7 +19,11 @@ ConcurrentHashMap是由Segment数组结构和HashEntry数组结构组成。Segme
 
 ## HashEntry 类
 
-HashEntry 用来封装散列映射表中的键值对。在 HashEntry 类中，key，hash 和 next 域都被声明为 final 型，value 域被声明为 volatile 型。
+HashEntry 用来封装散列映射表中的键值对。
+
+key，hash 和 next 域都被声明为 final 型，
+
+value 域被声明为 volatile 型。
 
 ```java
 static final class HashEntry<K,V> { 
@@ -27,12 +38,11 @@ static final class HashEntry<K,V> {
 
 在 ConcurrentHashMap 中，在散列时如果产生“碰撞”，将采用“分离链接法”来处理“碰撞”：把“碰撞”的 HashEntry 对象链接成一个链表。由于 HashEntry 的 next 域为 final 型，所以新节点只能在链表的表头处插入。 下图是在一个空桶中依次插入 A，B，C 三个 HashEntry 对象后的结构图：
 
-![å¾ 1. æå¥ä¸ä¸ªèç¹åæ¡¶çç"æç¤ºæå¾ï¼](https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image002.jpg)
+![a](https://www.ibm.com/developerworks/cn/java/java-lo-concurrenthashmap/image002.jpg)
 
 注意：由于只能在表头插入，所以链表中节点的顺序和插入的顺序相反。
 
 ConcurrentHashMap 默认创建 16 个 Segment 对象的数组。每个 Segment 的成员对象 table 包含若干个散列表的桶。每个桶是由 HashEntry 链接起来的一个链表。如果键能均匀散列，每个 Segment 大约守护整个散列表中桶总数的 1/16。
-
 
 
 ## 用分离锁实现多个线程间的并发写操作
